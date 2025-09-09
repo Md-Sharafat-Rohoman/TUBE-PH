@@ -1,18 +1,18 @@
-const videosdetails = document.getElementById('video_details');
-console.log(videosdetails)
+// const videosdetails 
 
 
 
 
 
 
-const removeActiveClass = () =>{
+const removeActiveClass = () => {
     const categoriesContainer = document.getElementsByClassName('bg-[#FF1F3D]', 'text-white')
-;
-for(const cat of categoriesContainer){
-    cat.classList.remove('bg-[#FF1F3D]', 'text-white')
-    console.log(cat)
-}}
+        ;
+    for (const cat of categoriesContainer) {
+        cat.classList.remove('bg-[#FF1F3D]', 'text-white')
+        console.log(cat)
+    }
+}
 
 const loadCategories = () => {
     fetch('https://openapi.programming-hero.com/api/phero-tube/categories')
@@ -20,8 +20,8 @@ const loadCategories = () => {
         .then(data => displayCategories(data.categories))
 }
 
-const loadVideos = () => {
-    fetch('https://openapi.programming-hero.com/api/phero-tube/videos')
+const loadVideos = (searchText = '') => {
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`)
         .then(res => res.json())
         .then(data => {
             removeActiveClass();
@@ -33,19 +33,55 @@ const loadVideos = () => {
 
 const loadVideoDetails = (id) => {
     console.log(id)
-    fetch(`https://openapi.programming-hero.com/api/phero-tube/video/${id}`)
-    .then(res => res.json())
-    .then(data => {
-        displayVideosDetails(data.video)
-    })
+    // fetch(`https://openapi.programming-hero.com/api/phero-tube/video/${id}`)
+    const url = `https://openapi.programming-hero.com/api/phero-tube/video/${id}`
+    fetch(url)
+        .then(res => res.json())
+        .then(data => displayVideosDetails(data.video))
+
 }
 
-// displayVideosDetails 
-const displayVideosDetails = (video) =>{
+// displayVideosDetails (
+const displayVideosDetails = (video) => {
     console.log(video)
-    // console.log('sharafat rohoamn')
-    const videoDetails = document.getElementById('video_details');
-    console.log(videoDetails)
+    document.getElementById("videoDetails").showModal();
+    const videoDetailsContainer = document.getElementById('video-details');
+    videoDetailsContainer.innerHTML = `
+                    <div class="card  bg-base-100 image-full w-96 shadow-sm">
+                         <figure>
+                           <img
+                             src="${video.thumbnail}"
+                             alt="Shoes" />
+                         </figure>
+                         <div class="card-body">
+                           <h2 class="card-title">${video.title}</h2>
+                           <p>${video.description}</p>
+                         </div>
+                   </div>
+                    
+                   
+    `;
+
+    /* 
+   {
+   "category_id": "1003",
+   "video_id": "aaac",
+   "thumbnail": "https://i.ibb.co/NTncwqH/luahg-at-pain.jpg",
+   "title": "Laugh at My Pain",
+   "authors": [
+       {
+           "profile_picture": "https://i.ibb.co/XVHM7NP/kevin.jpg",
+           "profile_name": "Kevin Hart",
+           "verified": false
+       }
+   ],
+   "others": {
+       "views": "1.1K",
+       "posted_date": "13885"
+   },
+   "description": "Comedian Kevin Hart brings his unique brand of humor to life in 'Laugh at My Pain.' With 1.1K views, this show offers a hilarious and candid look into Kevin's personal stories, struggles, and triumphs. It's a laugh-out-loud experience filled with sharp wit, clever insights, and a relatable charm that keeps audiences coming back for more."
+}
+   */
 
 
     // const showModals = document.getElementById("video_details");
@@ -99,26 +135,7 @@ const displayVideos = (videos) => {
         return;
     }
 
-    /* 
-    {
-    "category_id": "1003",
-    "video_id": "aaac",
-    "thumbnail": "https://i.ibb.co/NTncwqH/luahg-at-pain.jpg",
-    "title": "Laugh at My Pain",
-    "authors": [
-        {
-            "profile_picture": "https://i.ibb.co/XVHM7NP/kevin.jpg",
-            "profile_name": "Kevin Hart",
-            "verified": false
-        }
-    ],
-    "others": {
-        "views": "1.1K",
-        "posted_date": "13885"
-    },
-    "description": "Comedian Kevin Hart brings his unique brand of humor to life in 'Laugh at My Pain.' With 1.1K views, this show offers a hilarious and candid look into Kevin's personal stories, struggles, and triumphs. It's a laugh-out-loud experience filled with sharp wit, clever insights, and a relatable charm that keeps audiences coming back for more."
-}
-    */
+
 
     videos.forEach(video => {
         // console.log(video)
@@ -140,14 +157,18 @@ const displayVideos = (videos) => {
                     </div>
                     <div class="intor">
                         <h2 class="text-sm font-semibold">${video.title}</h2>
-                        <p class="text-sm text-gray-400 flex gap-2">${video.authors[0].profile_name}<img class="w-5 h-5"
-                                src="https://img.icons8.com/?size=96&id=98A4yZTt9abw&format=png" alt=""> </p>
+                        <p class="text-sm text-gray-400 flex gap-2">
+                        ${video.authors[0].profile_name}  
+                        ${video.authors[0].verified == true ? `<img class="w-5 h-5"
+                                src="https://img.icons8.com/?size=96&id=98A4yZTt9abw&format=png" alt="">` : ` `}   
+                        
+                        </p>
                                 <p class="text-sm text-gray-400">${video.others.views}</p>
                     </div>
                 </div>
 
-                <button onclick="loadVideoDetails()" class="w-full btn btn-block">Show Details</button>
-                
+                <button onclick="loadVideoDetails(\`${video.video_id}\`)" class="w-full btn btn-block">Show Details</button>
+
             </div>
     `;
 
@@ -160,6 +181,12 @@ const displayVideos = (videos) => {
 }
 
 
+
+document.getElementById('searchBox').addEventListener('keyup',(e)=>{
+    console.log(e.target.value)
+    const inputText = e.target.value;
+    loadVideos(inputText);
+})
 
 
 
