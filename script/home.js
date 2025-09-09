@@ -1,3 +1,19 @@
+const videosdetails = document.getElementById('video_details');
+console.log(videosdetails)
+
+
+
+
+
+
+const removeActiveClass = () =>{
+    const categoriesContainer = document.getElementsByClassName('bg-[#FF1F3D]', 'text-white')
+;
+for(const cat of categoriesContainer){
+    cat.classList.remove('bg-[#FF1F3D]', 'text-white')
+    console.log(cat)
+}}
+
 const loadCategories = () => {
     fetch('https://openapi.programming-hero.com/api/phero-tube/categories')
         .then(res => res.json())
@@ -7,18 +23,59 @@ const loadCategories = () => {
 const loadVideos = () => {
     fetch('https://openapi.programming-hero.com/api/phero-tube/videos')
         .then(res => res.json())
-        .then(data => displayVideos(data.videos))
+        .then(data => {
+            removeActiveClass();
+            document.getElementById('btn-all').classList.add('bg-[#FF1F3D]', 'text-white');
+            displayVideos(data.videos)
+        })
 }
 
+
+const loadVideoDetails = (id) => {
+    console.log(id)
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/video/${id}`)
+    .then(res => res.json())
+    .then(data => {
+        displayVideosDetails(data.video)
+    })
+}
+
+// displayVideosDetails 
+const displayVideosDetails = (video) =>{
+    console.log(video)
+    // console.log('sharafat rohoamn')
+    const videoDetails = document.getElementById('video_details');
+    console.log(videoDetails)
+
+
+    // const showModals = document.getElementById("video_details");
+    // showModals.showModal();
+}
+
+
+const loadCategoriesVideos = (id) => {
+    console.log(id);
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            removeActiveClass();
+            const clickedCategory = document.getElementById(`category-${id}`);
+            clickedCategory.classList.add('bg-[#FF1F3D]', 'text-white');
+            console.log(clickedCategory)
+            displayVideos(data.category)
+        })
+
+}
 
 
 const displayCategories = (categories) => {
     const categoriesContainer = document.getElementById('categories-container');
 
     for (let cat of categories) {
+        console.log(cat)
         const catDiv = document.createElement('div');
         catDiv.innerHTML = `
-        <button  class="btn btn-sm hover:bg-[#FF1F3D] hover:text-white">${cat.category}</button>
+        <button id='category-${cat.category_id}' onclick="loadCategoriesVideos(${cat.category_id})" class="btn btn-sm hover:bg-[#FF1F3D] hover:text-white">${cat.category}</button>
         `;
         categoriesContainer.appendChild(catDiv)
     }
@@ -29,6 +86,18 @@ const displayCategories = (categories) => {
 const displayVideos = (videos) => {
     // console.log(videos)
     const videosContainer = document.getElementById('videos-container');
+
+    videosContainer.innerHTML = '';
+
+    if (videos.length === 0) {
+        videosContainer.innerHTML = `
+            <div class="flex flex-col justify-center items-center col-span-4">
+                <img src="asset/Icon.png" alt="">
+                <h2 class="text-2xl font-bold">Oops!! Sorry, There is no content here</h2>
+            </div>
+        `;
+        return;
+    }
 
     /* 
     {
@@ -52,7 +121,7 @@ const displayVideos = (videos) => {
     */
 
     videos.forEach(video => {
-        console.log(video)
+        // console.log(video)
         const videoCard = document.createElement('div');
         videoCard.innerHTML = `
         <div class="card bg-base-100 shadow-sm">
@@ -76,6 +145,9 @@ const displayVideos = (videos) => {
                                 <p class="text-sm text-gray-400">${video.others.views}</p>
                     </div>
                 </div>
+
+                <button onclick="loadVideoDetails()" class="w-full btn btn-block">Show Details</button>
+                
             </div>
     `;
 
@@ -94,4 +166,3 @@ const displayVideos = (videos) => {
 
 
 loadCategories();
-loadVideos();
